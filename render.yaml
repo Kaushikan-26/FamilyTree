@@ -1,0 +1,23 @@
+# Render Blueprint — one Web Service that builds the client and serves it
+# from Express. Create the service via Render → "New +" → "Blueprint" and point
+# it at this repo, OR configure a Web Service manually with the same settings.
+services:
+  - type: web
+    name: family-tree
+    runtime: node
+    plan: free
+    # Build the client and install server deps
+    buildCommand: npm run build
+    # Run the Express server (it serves client/dist in production)
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Paste your real values in the Render dashboard (kept secret, not in git)
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d

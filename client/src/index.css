@@ -1,0 +1,649 @@
+:root {
+  --bg: #f1f5f9;
+  --panel: #ffffff;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --muted: #64748b;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --danger: #dc2626;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button {
+  cursor: pointer;
+  font: inherit;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.15s ease;
+}
+button:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn-secondary {
+  background: #e2e8f0;
+  color: var(--text);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: #cbd5e1;
+}
+.btn-danger {
+  background: var(--danger);
+}
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  background: #fff;
+  color: var(--text);
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 12px 0 4px;
+}
+
+.alert {
+  background: #fef2f2;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---------- Auth pages ---------- */
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #dbeafe, #ede9fe);
+  padding: 20px;
+}
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--panel);
+  padding: 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.auth-card h1 {
+  margin: 0 0 4px;
+  text-align: center;
+}
+.auth-subtitle {
+  text-align: center;
+  color: var(--muted);
+  margin: 0 0 20px;
+}
+.auth-card button[type="submit"] {
+  width: 100%;
+  margin-top: 20px;
+}
+.auth-switch {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Backend connection status banner on the auth pages */
+.backend-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12.5px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.backend-status .dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.backend-status code {
+  background: rgba(0, 0, 0, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.backend-status--ok {
+  background: #ecfdf5;
+  color: #047857;
+}
+.backend-status--ok .dot {
+  background: #10b981;
+}
+.backend-status--down {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+.backend-status--down .dot {
+  background: #ef4444;
+}
+.backend-status--warn {
+  background: #fffbeb;
+  color: #b45309;
+}
+.backend-status--warn .dot {
+  background: #f59e0b;
+}
+.backend-status--checking {
+  background: #f1f5f9;
+  color: var(--muted);
+}
+.backend-status--checking .dot {
+  background: #94a3b8;
+}
+
+/* ---------- Dashboard layout ---------- */
+.dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 5;
+}
+.topbar h1 {
+  font-size: 18px;
+  margin: 0;
+}
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.topbar__user {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.dashboard__body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: 300px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  overflow: hidden; /* the member list scrolls internally, not the whole sidebar */
+}
+/* Top controls + finder keep their natural size and never shrink */
+.sidebar__add,
+.sidebar__search,
+.finder {
+  flex-shrink: 0;
+}
+.sidebar__add {
+  width: 100%;
+}
+.sidebar__add--alt {
+  background: #0d9488;
+}
+.sidebar__add--alt:hover:not(:disabled) {
+  background: #0f766e;
+}
+/* Only the member list flexes and scrolls; min-height:0 lets it shrink so it
+   never overlaps the Relationship Finder below it */
+.sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+.sidebar__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  color: var(--text);
+  border: 1px solid var(--border);
+  text-align: left;
+  font-weight: 500;
+}
+.sidebar__item:hover {
+  background: #eef2ff;
+}
+.sidebar__item-meta {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+/* ---------- Relationship Finder ---------- */
+.finder {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.finder h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.finder button {
+  width: 100%;
+}
+.finder__result {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+}
+.finder__badge {
+  margin-top: 6px;
+  display: inline-block;
+  background: #059669;
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+/* ---------- Canvas / graph ---------- */
+.canvas {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+.canvas__empty {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--muted);
+  padding: 40px;
+}
+.canvas__alert {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+/* ---------- Member node (elegant card) ---------- */
+.member-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0 14px 14px;
+  width: 188px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1);
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.member-node:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+}
+.member-node.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
+}
+
+/* Gradient header band carrying the tag (gender-colored).
+   Extra bottom padding leaves clear space for the overlapping photo so the
+   tag text never collides with it. */
+.member-node__header {
+  width: calc(100% + 28px);
+  margin: 0 -14px 0;
+  padding: 11px 12px 46px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 15px 15px 0 0;
+}
+.member-node.male .member-node__header {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+.member-node.female .member-node__header {
+  background: linear-gradient(135deg, #f472b6, #db2777);
+}
+.member-node.other .member-node__header {
+  background: linear-gradient(135deg, #c084fc, #9333ea);
+}
+
+/* Photo overlaps the header band */
+.member-node__avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 36px;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-top: -38px;
+  border: 4px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+.member-node__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Memorial cross badge for deceased members */
+.member-node__memorial {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #475569;
+  color: #fff;
+  font-size: 12px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #fff;
+}
+.member-node.deceased .member-node__avatar img {
+  filter: grayscale(0.8);
+}
+
+.member-node__name {
+  font-weight: 700;
+  font-size: 15px;
+  margin-top: 8px;
+  color: #1f2937;
+}
+.member-node__age {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.member-node__dates {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.member-node__dates--center {
+  justify-content: center;
+}
+.member-node__bio {
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.3;
+  max-height: 46px;
+  overflow: hidden;
+}
+.member-node__edit {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 13px;
+  border-radius: 6px;
+}
+.member-node__edit:hover {
+  background: #fff;
+  color: var(--primary);
+}
+
+/* Connection handles: large, visible dots that sit just outside the card so
+   they're easy to grab and are never covered by the header or photo. */
+.member-node .react-flow__handle {
+  width: 13px;
+  height: 13px;
+  background: #2563eb;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  z-index: 20;
+}
+.member-node .react-flow__handle:hover {
+  background: #1d4ed8;
+  transform: scale(1.25);
+}
+.member-node .react-flow__handle-top {
+  top: -7px;
+}
+.member-node .react-flow__handle-bottom {
+  bottom: -7px;
+}
+.member-node .react-flow__handle-left {
+  left: -7px;
+}
+.member-node .react-flow__handle-right {
+  right: -7px;
+}
+
+/* Marriage-junction dot (anchor where a couple's lines meet) */
+.junction-node {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #111827;
+}
+.junction-node .react-flow__handle {
+  width: 6px;
+  height: 6px;
+  min-width: 0;
+  min-height: 0;
+  background: #111827;
+  border: none;
+  box-shadow: none;
+}
+
+/* Auto-arrange button (React Flow panel) */
+.layout-btn {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+  padding: 8px 12px;
+}
+.layout-btn:hover {
+  background: #f8fafc;
+}
+
+/* ---------- Photo uploader ---------- */
+.photo-upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.photo-upload__preview {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.photo-upload__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photo-upload__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.photo-upload__actions input[type="file"] {
+  font-size: 13px;
+  padding: 6px;
+}
+
+/* Two-column row inside forms (birth / death dates) */
+.form__row {
+  display: flex;
+  gap: 12px;
+}
+.form__row > div {
+  flex: 1;
+}
+
+/* ---------- Modal ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+  padding: 16px;
+}
+.modal {
+  width: 100%;
+  max-width: 440px;
+  background: var(--panel);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.modal__header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.modal__close {
+  background: transparent;
+  color: var(--muted);
+  font-size: 24px;
+  line-height: 1;
+  padding: 0 6px;
+}
+.modal__close:hover {
+  background: transparent;
+  color: var(--text);
+}
+.modal__body {
+  padding: 20px;
+}
+.form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+.rel-sentence {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+}
+.rel-sentence em {
+  text-transform: capitalize;
+  color: var(--primary);
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .dashboard__body {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    max-height: 45vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}

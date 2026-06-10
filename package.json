@@ -1,0 +1,15 @@
+{
+  "name": "family-tree-manager",
+  "version": "1.0.0",
+  "description": "Family Tree Management System — single-service deploy (Express serves the React build)",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "npm install --prefix server && npm install --prefix client --include=dev && npm run build --prefix client",
+    "start": "npm start --prefix server",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client"
+  }
+}
