@@ -4,6 +4,13 @@ A production-ready full-stack web app for building and managing a private family
 tree with a visual, graph-based editor. Each user has their own account and can
 only ever see and edit their own data.
 
+## 🚀 One-click deploy
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Kaushikan-26/FamilyTree)
+
+Click the button, sign in to Render, and set the secret env vars (`MONGO_URI`,
+`JWT_SECRET`). See [DEPLOYMENT.md](DEPLOYMENT.md) for the full guide.
+
 ## ✨ Features
 
 - **Authentication** — register/login with JWT + bcrypt-hashed passwords; every
