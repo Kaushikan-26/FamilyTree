@@ -42,11 +42,12 @@ export default function FamilyGraph({
   onDeleteRelationship,
   onSelectRelationship,
   onAddRelative,
+  onAddMemberAt,
   onAutoLayout,
 }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const { fitView } = useReactFlow();
+  const { fitView, screenToFlowPosition } = useReactFlow();
   const didAutoLayout = useRef(false);
 
   // Rebuild member nodes + junction nodes + tree edges whenever the data
@@ -121,6 +122,17 @@ export default function FamilyGraph({
     [onAddRelative]
   );
 
+  // Right-clicking the empty canvas adds a standalone member at that spot
+  const handlePaneContextMenu = useCallback(
+    (evt) => {
+      evt.preventDefault();
+      const p = screenToFlowPosition({ x: evt.clientX, y: evt.clientY });
+      // Offset so the card is roughly centered on the cursor
+      onAddMemberAt({ x: Math.round(p.x - 90), y: Math.round(p.y - 80) });
+    },
+    [screenToFlowPosition, onAddMemberAt]
+  );
+
   return (
     <ReactFlow
       nodes={nodes}
@@ -132,6 +144,7 @@ export default function FamilyGraph({
       onEdgesDelete={handleEdgesDelete}
       onEdgeClick={handleEdgeClick}
       onNodeContextMenu={handleNodeContextMenu}
+      onPaneContextMenu={handlePaneContextMenu}
       nodeTypes={nodeTypes}
       defaultEdgeOptions={{ type: "smoothstep" }}
       // Loose mode = start a connection from ANY handle (top or bottom).
@@ -148,7 +161,9 @@ export default function FamilyGraph({
         </button>
       </Panel>
       <Panel position="top-left">
-        <div className="graph-hint">💡 Right-click a card to add a relative</div>
+        <div className="graph-hint">
+          💡 Right-click a card to add a relative · right-click empty space to add a member
+        </div>
       </Panel>
       <Background gap={16} color="#e2e8f0" />
       {/* pointer-events disabled so the minimap never blocks dropping a

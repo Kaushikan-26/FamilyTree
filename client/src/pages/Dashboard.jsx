@@ -55,6 +55,11 @@ export default function Dashboard() {
 
   const openAdd = () => setMemberModal({ member: null });
   const openEdit = useCallback((member) => setMemberModal({ member }), []);
+  // Right-click empty canvas → add a standalone member at that position
+  const openAddAt = useCallback(
+    (position) => setMemberModal({ member: null, position }),
+    []
+  );
 
   // Triggered when the user drags a connection between two nodes
   const handleConnect = useCallback(
@@ -70,11 +75,13 @@ export default function Dashboard() {
     if (memberModal.member) {
       await editMember(memberModal.member._id, data);
     } else {
-      // Drop new members at a slight random offset so they don't overlap
-      await addMember({
-        ...data,
-        position: { x: 120 + Math.random() * 240, y: 120 + Math.random() * 160 },
-      });
+      // Use the right-click position if present, else a slight random offset
+      const position =
+        memberModal.position || {
+          x: 120 + Math.random() * 240,
+          y: 120 + Math.random() * 160,
+        };
+      await addMember({ ...data, position });
     }
   };
 
@@ -136,6 +143,7 @@ export default function Dashboard() {
                 onDeleteRelationship={removeRelationship}
                 onSelectRelationship={setEditRelId}
                 onAddRelative={setRelativeAnchorId}
+                onAddMemberAt={openAddAt}
                 onAutoLayout={saveMemberPositions}
               />
             </ReactFlowProvider>
