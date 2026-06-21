@@ -134,42 +134,49 @@ export default function FamilyGraph({
   );
 
   return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={handleConnect}
-      onNodeDragStop={handleNodeDragStop}
-      onEdgesDelete={handleEdgesDelete}
-      onEdgeClick={handleEdgeClick}
-      onNodeContextMenu={handleNodeContextMenu}
-      onPaneContextMenu={handlePaneContextMenu}
-      nodeTypes={nodeTypes}
-      defaultEdgeOptions={{ type: "smoothstep" }}
-      // Loose mode = start a connection from ANY handle (top or bottom).
-      // Large connectionRadius = releasing the drag anywhere near another
-      // card snaps to its nearest handle, so you just "touch" the target.
-      connectionMode={ConnectionMode.Loose}
-      connectionRadius={160}
-      fitView
-      proOptions={{ hideAttribution: true }}
+    // Wrapper suppresses the browser's native right-click menu everywhere in
+    // the graph, so our own "add member / add relative" actions always win.
+    <div
+      style={{ width: "100%", height: "100%" }}
+      onContextMenu={(e) => e.preventDefault()}
     >
-      <Panel position="top-right">
-        <button className="layout-btn" onClick={applyLayout}>
-          ⤵ Auto Arrange
-        </button>
-      </Panel>
-      <Panel position="top-left">
-        <div className="graph-hint">
-          💡 Right-click a card to add a relative · right-click empty space to add a member
-        </div>
-      </Panel>
-      <Background gap={16} color="#e2e8f0" />
-      {/* pointer-events disabled so the minimap never blocks dropping a
-          connection onto a node that happens to sit beneath it */}
-      <MiniMap style={{ pointerEvents: "none" }} />
-      <Controls />
-    </ReactFlow>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={handleConnect}
+        onNodeDragStop={handleNodeDragStop}
+        onEdgesDelete={handleEdgesDelete}
+        onEdgeClick={handleEdgeClick}
+        onNodeContextMenu={handleNodeContextMenu}
+        onPaneContextMenu={handlePaneContextMenu}
+        nodeTypes={nodeTypes}
+        defaultEdgeOptions={{ type: "smoothstep" }}
+        // Loose mode = start a connection from ANY handle (top or bottom).
+        // Large connectionRadius = releasing the drag anywhere near another
+        // card snaps to its nearest handle, so you just "touch" the target.
+        connectionMode={ConnectionMode.Loose}
+        connectionRadius={160}
+        fitView
+        proOptions={{ hideAttribution: true }}
+      >
+        <Panel position="top-right">
+          <button className="layout-btn" onClick={applyLayout}>
+            ⤵ Auto Arrange
+          </button>
+        </Panel>
+        <Panel position="top-left">
+          <div className="graph-hint">
+            💡 Right-click a card to add a relative · right-click empty space to add a member
+          </div>
+        </Panel>
+        <Background gap={16} color="#e2e8f0" />
+        {/* pointer-events disabled so the minimap never blocks dropping a
+            connection onto a node that happens to sit beneath it */}
+        <MiniMap style={{ pointerEvents: "none" }} />
+        <Controls />
+      </ReactFlow>
+    </div>
   );
 }
