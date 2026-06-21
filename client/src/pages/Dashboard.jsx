@@ -7,7 +7,23 @@ import FamilyGraph from "../components/FamilyGraph.jsx";
 import MemberModal from "../components/MemberModal.jsx";
 import RelationshipModal from "../components/RelationshipModal.jsx";
 import AddRelationshipModal from "../components/AddRelationshipModal.jsx";
+import AddRelativeModal from "../components/AddRelativeModal.jsx";
 import EditRelationshipModal from "../components/EditRelationshipModal.jsx";
+
+// Approx card size for placing a new relative next to its anchor
+const COL = 230;
+const ROW = 300;
+
+// Where to drop a new relative relative to the anchor, based on the relationship
+const placeRelative = (anchor, type) => {
+  const x = anchor.position?.x || 0;
+  const y = anchor.position?.y || 0;
+  if (["father", "mother", "parent"].includes(type)) return { x, y: y - ROW };
+  if (["grandfather", "grandmother"].includes(type)) return { x, y: y - ROW * 2 };
+  if (["son", "daughter", "child"].includes(type)) return { x, y: y + ROW };
+  // spouse / sibling / cousin → beside the anchor
+  return { x: x + COL, y };
+};
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -34,6 +50,8 @@ export default function Dashboard() {
   const [addRelOpen, setAddRelOpen] = useState(false);
   // Edit-relationship modal state: the relationship id clicked on an edge
   const [editRelId, setEditRelId] = useState(null);
+  // "Add relative" (right-click) state: the anchor member id
+  const [relativeAnchorId, setRelativeAnchorId] = useState(null);
 
   const openAdd = () => setMemberModal({ member: null });
   const openEdit = useCallback((member) => setMemberModal({ member }), []);
@@ -59,6 +77,24 @@ export default function Dashboard() {
       });
     }
   };
+
+  // Right-click flow: create the new member near its anchor, then link them so
+  // the edge appears automatically. Relationship reads "new is <type> of anchor".
+  const handleAddRelative = async ({ relationshipType, member }) => {
+    const anchor = members.find((m) => m._id === relativeAnchorId);
+    if (!anchor) return;
+    const created = await addMember({
+      ...member,
+      position: placeRelative(anchor, relationshipType),
+    });
+    await addRelationship({
+      fromMemberId: created._id,
+      toMemberId: anchor._id,
+      relationshipType,
+    });
+  };
+
+  const relativeAnchor = members.find((m) => m._id === relativeAnchorId);
 
   return (
     <div className="dashboard">
@@ -99,6 +135,7 @@ export default function Dashboard() {
                 onMoveMember={saveMemberPosition}
                 onDeleteRelationship={removeRelationship}
                 onSelectRelationship={setEditRelId}
+                onAddRelative={setRelativeAnchorId}
                 onAutoLayout={saveMemberPositions}
               />
             </ReactFlowProvider>
@@ -129,6 +166,14 @@ export default function Dashboard() {
           members={members}
           onClose={() => setAddRelOpen(false)}
           onSave={addRelationship}
+        />
+      )}
+
+      {relativeAnchor && (
+        <AddRelativeModal
+          anchor={relativeAnchor}
+          onClose={() => setRelativeAnchorId(null)}
+          onSave={handleAddRelative}
         />
       )}
 

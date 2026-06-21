@@ -41,6 +41,7 @@ export default function FamilyGraph({
   onMoveMember,
   onDeleteRelationship,
   onSelectRelationship,
+  onAddRelative,
   onAutoLayout,
 }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -111,6 +112,15 @@ export default function FamilyGraph({
     [onSelectRelationship]
   );
 
+  // Right-clicking a member node opens "Add a relative" (auto-connected)
+  const handleNodeContextMenu = useCallback(
+    (evt, node) => {
+      evt.preventDefault(); // suppress the browser context menu
+      if (node.type === "member") onAddRelative(node.id);
+    },
+    [onAddRelative]
+  );
+
   return (
     <ReactFlow
       nodes={nodes}
@@ -121,6 +131,7 @@ export default function FamilyGraph({
       onNodeDragStop={handleNodeDragStop}
       onEdgesDelete={handleEdgesDelete}
       onEdgeClick={handleEdgeClick}
+      onNodeContextMenu={handleNodeContextMenu}
       nodeTypes={nodeTypes}
       defaultEdgeOptions={{ type: "smoothstep" }}
       // Loose mode = start a connection from ANY handle (top or bottom).
@@ -135,6 +146,9 @@ export default function FamilyGraph({
         <button className="layout-btn" onClick={applyLayout}>
           ⤵ Auto Arrange
         </button>
+      </Panel>
+      <Panel position="top-left">
+        <div className="graph-hint">💡 Right-click a card to add a relative</div>
       </Panel>
       <Background gap={16} color="#e2e8f0" />
       {/* pointer-events disabled so the minimap never blocks dropping a
