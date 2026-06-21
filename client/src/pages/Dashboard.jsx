@@ -14,13 +14,16 @@ import EditRelationshipModal from "../components/EditRelationshipModal.jsx";
 const COL = 230;
 const ROW = 300;
 
+const CHILD_TYPES = new Set(["son", "daughter", "child"]);
+const PARENT_TYPES = new Set(["father", "mother", "parent"]);
+
 // Where to drop a new relative relative to the anchor, based on the relationship
 const placeRelative = (anchor, type) => {
   const x = anchor.position?.x || 0;
   const y = anchor.position?.y || 0;
-  if (["father", "mother", "parent"].includes(type)) return { x, y: y - ROW };
+  if (PARENT_TYPES.has(type)) return { x, y: y - ROW };
   if (["grandfather", "grandmother"].includes(type)) return { x, y: y - ROW * 2 };
-  if (["son", "daughter", "child"].includes(type)) return { x, y: y + ROW };
+  if (CHILD_TYPES.has(type)) return { x, y: y + ROW };
   // spouse / sibling / cousin → beside the anchor
   return { x: x + COL, y };
 };
@@ -85,8 +88,32 @@ export default function Dashboard() {
     }
   };
 
-  // Right-click flow: create the new member near its anchor, then link them so
-  // the edge appears automatically. Relationship reads "new is <type> of anchor".
+  // Spouses of a member (from the current relationships)
+  const spousesOf = (id) => {
+    const out = new Set();
+    relationships.forEach((r) => {
+      if (r.relationshipType !== "spouse") return;
+      if (r.fromMemberId === id) out.add(r.toMemberId);
+      else if (r.toMemberId === id) out.add(r.fromMemberId);
+    });
+    return out;
+  };
+
+  // Direct children of a member (from the current relationships)
+  const childrenOf = (id) => {
+    const out = new Set();
+    relationships.forEach((r) => {
+      if (PARENT_TYPES.has(r.relationshipType) && r.fromMemberId === id)
+        out.add(r.toMemberId);
+      else if (CHILD_TYPES.has(r.relationshipType) && r.toMemberId === id)
+        out.add(r.fromMemberId);
+    });
+    return out;
+  };
+
+  // Right-click flow: create the new member near its anchor and connect it.
+  // When adding a CHILD, also connect it to the anchor's spouse(s) (so it
+  // descends from the couple) and to any existing children as siblings.
   const handleAddRelative = async ({ relationshipType, member }) => {
     const anchor = members.find((m) => m._id === relativeAnchorId);
     if (!anchor) return;
@@ -94,11 +121,46 @@ export default function Dashboard() {
       ...member,
       position: placeRelative(anchor, relationshipType),
     });
-    await addRelationship({
-      fromMemberId: created._id,
-      toMemberId: anchor._id,
-      relationshipType,
-    });
+
+    const links = [
+      { fromMemberId: created._id, toMemberId: anchor._id, relationshipType },
+    ];
+
+    if (CHILD_TYPES.has(relationshipType)) {
+      const spouseIds = [...spousesOf(anchor._id)];
+      // child of the anchor's spouse too → becomes the couple's child
+      spouseIds.forEach((sid) =>
+        links.push({ fromMemberId: created._id, toMemberId: sid, relationshipType })
+      );
+      // sibling of every existing child of either parent
+      const siblingType =
+        created.gender === "male"
+          ? "brother"
+          : created.gender === "female"
+          ? "sister"
+          : "sibling";
+      const existing = new Set();
+      [anchor._id, ...spouseIds].forEach((pid) =>
+        childrenOf(pid).forEach((cid) => existing.add(cid))
+      );
+      existing.delete(created._id);
+      existing.forEach((cid) =>
+        links.push({
+          fromMemberId: created._id,
+          toMemberId: cid,
+          relationshipType: siblingType,
+        })
+      );
+    }
+
+    // Create each link; skip any the backend rejects (e.g. duplicates)
+    for (const link of links) {
+      try {
+        await addRelationship(link);
+      } catch {
+        /* ignore duplicate / invalid */
+      }
+    }
   };
 
   const relativeAnchor = members.find((m) => m._id === relativeAnchorId);
