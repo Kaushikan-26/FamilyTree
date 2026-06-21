@@ -4,17 +4,29 @@ import { RELATIONSHIP_TYPES } from "../constants/relationshipTypes.js";
 
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024; // 2 MB
 
+const CHILD_TYPES = new Set(["son", "daughter", "child"]);
+const SIBLING_TYPES = new Set(["brother", "sister", "sibling"]);
+
+/** 1 -> "1st", 2 -> "2nd", 3 -> "3rd", 4 -> "4th" ... */
+const ordinal = (n) => {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
 /**
  * Opened by right-clicking a member node. Creates a NEW member and links it to
- * the right-clicked (anchor) member in one step — the edge then appears
- * automatically.
+ * the right-clicked (anchor) member in one step — the edge appears automatically.
  *
- * The relationship reads: "<new member> is the <type> of <anchor>".
- * So picking "son" on a right-clicked "Ravi" creates Ravi's son, connected.
+ * - Adding a CHILD asks the birth order (1st child, 2nd child, …).
+ * - Adding a SIBLING asks whether they're elder or younger than the anchor.
+ * Both are stored (birthOrder for ordering, orderLabel for display).
  */
 export default function AddRelativeModal({ anchor, onClose, onSave }) {
   const fileRef = useRef(null);
   const [type, setType] = useState("son");
+  const [childOrder, setChildOrder] = useState(1); // 1st, 2nd, …
+  const [siblingRank, setSiblingRank] = useState("younger"); // elder | younger
   const [form, setForm] = useState({
     name: "",
     tag: "",
@@ -26,6 +38,9 @@ export default function AddRelativeModal({ anchor, onClose, onSave }) {
   });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const isChild = CHILD_TYPES.has(type);
+  const isSibling = SIBLING_TYPES.has(type);
 
   const update = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
@@ -39,6 +54,21 @@ export default function AddRelativeModal({ anchor, onClose, onSave }) {
     reader.readAsDataURL(file);
   };
 
+  // Derive the seniority fields from the relationship + chosen order
+  const seniority = () => {
+    if (isChild) {
+      return { birthOrder: childOrder, orderLabel: `${ordinal(childOrder)} child` };
+    }
+    if (isSibling) {
+      const anchorOrder = Number.isFinite(anchor.birthOrder) ? anchor.birthOrder : 1;
+      return {
+        birthOrder: siblingRank === "elder" ? anchorOrder - 1 : anchorOrder + 1,
+        orderLabel: siblingRank === "elder" ? "Elder" : "Younger",
+      };
+    }
+    return { birthOrder: undefined, orderLabel: "" };
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) return setError("Name is required");
@@ -49,6 +79,7 @@ export default function AddRelativeModal({ anchor, onClose, onSave }) {
         relationshipType: type,
         member: {
           ...form,
+          ...seniority(),
           dateOfBirth: form.dateOfBirth || null,
           deathDate: form.deathDate || null,
         },
@@ -78,6 +109,34 @@ export default function AddRelativeModal({ anchor, onClose, onSave }) {
           <strong>{anchor.name}</strong>
         </p>
 
+        {/* Birth order — only when adding a child */}
+        {isChild && (
+          <>
+            <label>Which child?</label>
+            <select
+              value={childOrder}
+              onChange={(e) => setChildOrder(Number(e.target.value))}
+            >
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                <option key={n} value={n}>
+                  {ordinal(n)} child
+                </option>
+              ))}
+            </select>
+          </>
+        )}
+
+        {/* Elder / younger — only when adding a sibling */}
+        {isSibling && (
+          <>
+            <label>Elder or younger than {anchor.name}?</label>
+            <select value={siblingRank} onChange={(e) => setSiblingRank(e.target.value)}>
+              <option value="elder">Elder</option>
+              <option value="younger">Younger</option>
+            </select>
+          </>
+        )}
+
         <label>Photo</label>
         <div className="photo-upload">
           <div className="photo-upload__preview">
@@ -101,17 +160,13 @@ export default function AddRelativeModal({ anchor, onClose, onSave }) {
           <option value="other">Other</option>
         </select>
 
-        <div className="form__row">
-          <div>
-            <label>Birth Date</label>
-            <input type="date" value={form.dateOfBirth} onChange={update("dateOfBirth")} />
-          </div>
-          <div>
-            <label>Death Date</label>
-            <input type="date" value={form.deathDate} onChange={update("deathDate")} />
-          </div>
-        </div>
+        <label>Birth Date</label>
+        <input type="date" value={form.dateOfBirth} onChange={update("dateOfBirth")} />
 
+        {/* Additional info (death date + bio) */}
+        <p className="form__section">Additional info</p>
+        <label>Death Date</label>
+        <input type="date" value={form.deathDate} onChange={update("deathDate")} />
         <label>Bio</label>
         <textarea rows={2} value={form.bio} onChange={update("bio")} />
 

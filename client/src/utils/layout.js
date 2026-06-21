@@ -24,6 +24,15 @@ export function getLayoutedPositions(members, relationships) {
   if (!ids.length) return {};
   const idSet = new Set(ids);
 
+  // Birth order for left→right sibling/child ordering (unset sorts last)
+  const order = new Map();
+  members.forEach((m) =>
+    order.set(
+      String(m._id),
+      Number.isFinite(m.birthOrder) ? m.birthOrder : 999
+    )
+  );
+
   const parents = new Map(); // child -> Set(parent)
   const grand = new Map(); // grandchild -> Set(grandparent)
   const spouses = new Map(); // id -> Set(spouse)
@@ -136,8 +145,10 @@ export function getLayoutedPositions(members, relationships) {
       clusters.get(root).push(id);
     });
 
-    // Each cluster wants to sit under the average x of its members' parents
+    // Each cluster wants to sit under the average x of its members' parents;
+    // members within a cluster are ordered by birth order (eldest first)
     const clusterArr = [...clusters.values()].map((memberIds) => {
+      memberIds.sort((a, b) => order.get(a) - order.get(b));
       let sum = 0;
       let count = 0;
       memberIds.forEach((id) => {
@@ -148,14 +159,19 @@ export function getLayoutedPositions(members, relationships) {
           }
         }
       });
-      return { memberIds, desired: count ? sum / count : null };
+      return {
+        memberIds,
+        desired: count ? sum / count : null,
+        minOrder: Math.min(...memberIds.map((id) => order.get(id))),
+      };
     });
 
-    // Order clusters left→right by their desired x (parentless ones keep order)
+    // Order clusters left→right by parent x, tie-broken by birth order
     clusterArr.sort((a, b) => {
-      if (a.desired == null && b.desired == null) return 0;
+      if (a.desired == null && b.desired == null) return a.minOrder - b.minOrder;
       if (a.desired == null) return 1;
       if (b.desired == null) return -1;
+      if (Math.abs(a.desired - b.desired) < 1) return a.minOrder - b.minOrder;
       return a.desired - b.desired;
     });
 

@@ -22,13 +22,25 @@ export const getMembers = async (req, res, next) => {
 /** POST /api/members — create a member owned by the current user. */
 export const createMember = async (req, res, next) => {
   try {
-    const { name, tag, gender, dateOfBirth, deathDate, photo, bio, position } =
-      req.body;
+    const {
+      name,
+      tag,
+      gender,
+      birthOrder,
+      orderLabel,
+      dateOfBirth,
+      deathDate,
+      photo,
+      bio,
+      position,
+    } = req.body;
     const member = await Member.create({
       userId: req.user._id,
       name,
       tag,
       gender,
+      birthOrder,
+      orderLabel,
       dateOfBirth,
       deathDate,
       photo,
@@ -54,6 +66,8 @@ export const updateMember = async (req, res, next) => {
       "name",
       "tag",
       "gender",
+      "birthOrder",
+      "orderLabel",
       "dateOfBirth",
       "deathDate",
       "photo",

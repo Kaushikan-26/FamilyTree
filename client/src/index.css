@@ -436,6 +436,48 @@ label {
   font-weight: 700;
   letter-spacing: 0.03em;
 }
+/* Seniority badge: "1st child", "Elder", "Younger" */
+.member-node__order {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #b45309;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+/* Additional info expander */
+.member-node__info-toggle {
+  margin-top: 8px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+.member-node__info-toggle:hover {
+  background: #e2e8f0;
+}
+.member-node__info {
+  margin-top: 6px;
+  width: 100%;
+  text-align: left;
+  font-size: 10.5px;
+  color: var(--muted);
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+.member-node__info-row {
+  line-height: 1.4;
+}
+.member-node__info-row + .member-node__info-row {
+  margin-top: 4px;
+}
 .member-node__dates {
   display: flex;
   justify-content: space-between;
@@ -581,6 +623,16 @@ label {
 }
 .form__row > div {
   flex: 1;
+}
+
+/* Sub-heading separating an "Additional info" group in a form */
+.form__section {
+  margin: 16px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
 }
 
 /* ---------- Modal ---------- */

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Handle, Position } from "reactflow";
 
 /** Emoji avatar fallback based on gender. */
@@ -30,18 +31,16 @@ const calcAge = (dob, end) => {
 
 /**
  * Custom React Flow node rendering a family member card.
- * Layout (top → bottom):
- *   gradient header (tag) → overlapping photo → name → AGE pill → dates → bio
- *
- * Dates:
- *   - Living (no death date): birth date shown centered.
- *   - Deceased: birth date on the left (B:), death date on the right (D:).
- * Age: current age for the living, age-at-death for the deceased.
+ * Face (always shown): tag → photo → name → order badge → AGE → birth date.
+ * Death date and bio live behind an "Additional info" expander to keep the
+ * card compact.
  */
 export default function MemberNode({ data, selected }) {
   const { member, onEdit } = data;
+  const [showInfo, setShowInfo] = useState(false);
   const deceased = Boolean(member.deathDate);
   const age = calcAge(member.dateOfBirth, member.deathDate);
+  const hasExtra = Boolean(member.deathDate || member.bio);
 
   return (
     <div
@@ -49,9 +48,8 @@ export default function MemberNode({ data, selected }) {
         deceased ? "deceased" : ""
       }`}
     >
-      {/* Connection points. Top/bottom are used for parent→child (vertical)
-          links; left/right for spouse/sibling (horizontal) links, which keeps
-          the arrows clean and easy to read. */}
+      {/* Connection points. Top/bottom = parent→child (vertical); left/right =
+          spouse/sibling (horizontal), which keeps the arrows clean. */}
       <Handle id="top" type="target" position={Position.Top} />
       <Handle id="left" type="target" position={Position.Left} />
       <Handle id="right" type="source" position={Position.Right} />
@@ -60,7 +58,7 @@ export default function MemberNode({ data, selected }) {
       <div className="member-node__header">{member.tag || member.gender}</div>
 
       <button
-        className="member-node__edit"
+        className="member-node__edit nodrag"
         title="Edit member"
         onClick={(e) => {
           e.stopPropagation();
@@ -83,23 +81,49 @@ export default function MemberNode({ data, selected }) {
       {/* Name */}
       <div className="member-node__name">{member.name}</div>
 
+      {/* Seniority badge (e.g. "1st child", "Elder") */}
+      {member.orderLabel && (
+        <div className="member-node__order">{member.orderLabel}</div>
+      )}
+
       {/* Current age (auto-computed from DOB) */}
       {age !== null && <div className="member-node__age">AGE: {age}</div>}
 
-      {/* Dates: centered birth if living, B left / D right if deceased */}
+      {/* Birth date (death date moved into Additional info) */}
       {member.dateOfBirth && (
-        <div
-          className={`member-node__dates ${
-            deceased ? "" : "member-node__dates--center"
-          }`}
-        >
+        <div className="member-node__dates member-node__dates--center">
           <span>B: {fmtDate(member.dateOfBirth)}</span>
-          {deceased && <span>D: {fmtDate(member.deathDate)}</span>}
         </div>
       )}
 
-      {/* Bio */}
-      {member.bio && <div className="member-node__bio">{member.bio}</div>}
+      {/* Additional info expander: death date + bio */}
+      {hasExtra && (
+        <>
+          <button
+            className="member-node__info-toggle nodrag"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowInfo((s) => !s);
+            }}
+          >
+            {showInfo ? "▲ Less info" : "ℹ Additional info"}
+          </button>
+          {showInfo && (
+            <div className="member-node__info">
+              {member.deathDate && (
+                <div className="member-node__info-row">
+                  <strong>Died:</strong> {fmtDate(member.deathDate)}
+                </div>
+              )}
+              {member.bio && (
+                <div className="member-node__info-row">
+                  <strong>Bio:</strong> {member.bio}
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
 
       <Handle id="bottom" type="source" position={Position.Bottom} />
     </div>

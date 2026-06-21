@@ -26,6 +26,18 @@ const memberSchema = new mongoose.Schema(
       enum: ["male", "female", "other"],
       default: "other",
     },
+    // Seniority among siblings: birthOrder is a number used for ordering
+    // (1 = eldest); orderLabel is the text shown on the card
+    // (e.g. "1st child", "Elder", "Younger").
+    birthOrder: {
+      type: Number,
+    },
+    orderLabel: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: [20, "Order label too long"],
+    },
     dateOfBirth: {
       type: Date,
     },
