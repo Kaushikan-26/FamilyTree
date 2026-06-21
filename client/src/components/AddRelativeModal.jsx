@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import Modal from "./Modal.jsx";
+import CollapsibleSection from "./CollapsibleSection.jsx";
 import { RELATIONSHIP_TYPES } from "../constants/relationshipTypes.js";
 
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024; // 2 MB
@@ -163,12 +164,13 @@ export default function AddRelativeModal({ anchor, onClose, onSave }) {
         <label>Birth Date</label>
         <input type="date" value={form.dateOfBirth} onChange={update("dateOfBirth")} />
 
-        {/* Additional info (death date + bio) */}
-        <p className="form__section">Additional info</p>
-        <label>Death Date</label>
-        <input type="date" value={form.deathDate} onChange={update("deathDate")} />
-        <label>Bio</label>
-        <textarea rows={2} value={form.bio} onChange={update("bio")} />
+        {/* Additional info (death date + bio) hidden behind a hamburger toggle */}
+        <CollapsibleSection title="Additional info">
+          <label>Death Date</label>
+          <input type="date" value={form.deathDate} onChange={update("deathDate")} />
+          <label>Bio</label>
+          <textarea rows={2} value={form.bio} onChange={update("bio")} />
+        </CollapsibleSection>
 
         <div className="form__actions">
           <button type="button" className="btn-secondary" onClick={onClose} disabled={busy}>

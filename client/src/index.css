@@ -448,18 +448,22 @@ label {
   font-weight: 700;
   text-transform: capitalize;
 }
-/* Additional info expander */
-.member-node__info-toggle {
-  margin-top: 8px;
-  background: #f1f5f9;
-  color: #475569;
-  font-size: 10.5px;
-  font-weight: 600;
-  padding: 3px 10px;
+/* Hamburger toggle for additional info (top-left of card) */
+.member-node__menu {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  padding: 2px 7px;
+  font-size: 13px;
+  line-height: 1;
   border-radius: 6px;
 }
-.member-node__info-toggle:hover {
-  background: #e2e8f0;
+.member-node__menu:hover {
+  background: #fff;
+  color: var(--primary);
 }
 .member-node__info {
   margin-top: 6px;
@@ -633,6 +637,39 @@ label {
   font-size: 13px;
   font-weight: 700;
   color: var(--muted);
+}
+
+/* Collapsible form section behind a hamburger toggle */
+.collapsible {
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.collapsible__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: #f1f5f9;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+.collapsible__toggle:hover {
+  background: #e2e8f0;
+}
+.collapsible__icon {
+  font-size: 14px;
+}
+.collapsible__chev {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--muted);
+}
+.collapsible__body {
+  margin-top: 4px;
 }
 
 /* ---------- Modal ---------- */

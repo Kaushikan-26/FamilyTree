@@ -166,11 +166,6 @@ export default function FamilyGraph({
             ⤵ Auto Arrange
           </button>
         </Panel>
-        <Panel position="top-left">
-          <div className="graph-hint">
-            💡 Right-click a card to add a relative · right-click empty space to add a member
-          </div>
-        </Panel>
         <Background gap={16} color="#e2e8f0" />
         {/* pointer-events disabled so the minimap never blocks dropping a
             connection onto a node that happens to sit beneath it */}

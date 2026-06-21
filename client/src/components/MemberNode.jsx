@@ -68,6 +68,21 @@ export default function MemberNode({ data, selected }) {
         ✎
       </button>
 
+      {/* Hamburger toggle for Additional info (top-left), shown only if there's
+          extra info to reveal */}
+      {hasExtra && (
+        <button
+          className="member-node__menu nodrag"
+          title="Additional info"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowInfo((s) => !s);
+          }}
+        >
+          {showInfo ? "✕" : "☰"}
+        </button>
+      )}
+
       {/* Photo (overlaps the header) */}
       <div className="member-node__avatar">
         {member.photo ? (
@@ -96,33 +111,20 @@ export default function MemberNode({ data, selected }) {
         </div>
       )}
 
-      {/* Additional info expander: death date + bio */}
-      {hasExtra && (
-        <>
-          <button
-            className="member-node__info-toggle nodrag"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowInfo((s) => !s);
-            }}
-          >
-            {showInfo ? "▲ Less info" : "ℹ Additional info"}
-          </button>
-          {showInfo && (
-            <div className="member-node__info">
-              {member.deathDate && (
-                <div className="member-node__info-row">
-                  <strong>Died:</strong> {fmtDate(member.deathDate)}
-                </div>
-              )}
-              {member.bio && (
-                <div className="member-node__info-row">
-                  <strong>Bio:</strong> {member.bio}
-                </div>
-              )}
+      {/* Additional info panel: revealed by the hamburger toggle */}
+      {hasExtra && showInfo && (
+        <div className="member-node__info">
+          {member.deathDate && (
+            <div className="member-node__info-row">
+              <strong>Died:</strong> {fmtDate(member.deathDate)}
             </div>
           )}
-        </>
+          {member.bio && (
+            <div className="member-node__info-row">
+              <strong>Bio:</strong> {member.bio}
+            </div>
+          )}
+        </div>
       )}
 
       <Handle id="bottom" type="source" position={Position.Bottom} />

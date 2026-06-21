@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import Modal from "./Modal.jsx";
+import CollapsibleSection from "./CollapsibleSection.jsx";
 
 /** Format a Date/ISO value into the yyyy-mm-dd a date input expects. */
 const toDateInput = (value) => (value ? value.substring(0, 10) : "");
@@ -135,19 +136,16 @@ export default function MemberModal({ member, onClose, onSave, onDelete }) {
           <option value="other">Other</option>
         </select>
 
-        <div className="form__row">
-          <div>
-            <label>Birth Date</label>
-            <input type="date" value={form.dateOfBirth} onChange={update("dateOfBirth")} />
-          </div>
-          <div>
-            <label>Death Date</label>
-            <input type="date" value={form.deathDate} onChange={update("deathDate")} />
-          </div>
-        </div>
+        <label>Birth Date</label>
+        <input type="date" value={form.dateOfBirth} onChange={update("dateOfBirth")} />
 
-        <label>Bio</label>
-        <textarea rows={3} value={form.bio} onChange={update("bio")} />
+        {/* Additional info (death date + bio) hidden behind a hamburger toggle */}
+        <CollapsibleSection title="Additional info" defaultOpen={Boolean(form.deathDate || form.bio)}>
+          <label>Death Date</label>
+          <input type="date" value={form.deathDate} onChange={update("deathDate")} />
+          <label>Bio</label>
+          <textarea rows={3} value={form.bio} onChange={update("bio")} />
+        </CollapsibleSection>
 
         <div className="form__actions">
           {editing && (
